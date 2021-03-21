@@ -1,0 +1,884 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="unqualified">
+	<xs:annotation>
+		<xs:documentation> 	OSISCore.1.0.xsd  	<p>
+				<date>2002-04-25</date>
+				<version>1.0</version>
+				This is version 1.0 of the OSIS (Open Scriptural Information Standard) schema for Bible and biblical texts. While it will produce valid XML documents on its own, it is intended for use with the OSISScripture1.0.xsd and other schemas to be released by the OSIS Initiative. These additional schemas incorporate the core schema and provide validation for references and other extensions that may be required for more complex uses, such as by translators, publishers and scholars.</p>
+			<p>This schema did not spring full blown into existence but was heavily influenced by prior efforts such as XSEM (SIL), LGM (Logos), ThML (Harry Plantiga), SFM (UBS), and CCML (Hosanna Foundation). Unlike these prior efforts, OSIS has focused on producing the minimal encoding necessary to markup simple Bible texts and will be placing in additional modules the markup needed for more sophisticated users. The primary purpose behind that design was to allow users an easy learning curve for applying markup to biblical texts. All the element names that they learn for the core schema, can be applied, with additional abilities in the following modules. Despite our reliance on the pioneering efforts of others, any errors in substance or style in this schema remain the responsibility of the editors and contributors.</p>
+			<p>The work on this schema was made possible by the generous support of the American Bible Society, American Bible Society Interactive, and the Society of Biblical Literature. Contributions of prior encoding efforts, texts (the sample texts from the Good News Today translation are used in the documentation with the kind permission of the American Bible Society), and suggestions and comments from the participants in OSIS public meetings and mailing list were instrumental in the formation of this release.</p>
+			<p>The principal editors for this core module and the companion scripture schema are Steve DeRose (sderose@speakeasy.net), and Patrick Durusau (Society of Biblical Literature, pdurusau@emory.edu). Technical contributors (who often turned around sample encodings of the Book of Matthew on the same day as schema revisions!) were Troy Griffiths (scribe@crosswire.org), Chris Little (chrislit@crosswire.org), and Todd Tillinghast (todd@contentframeworks.com).</p>
+		</xs:documentation>
+	</xs:annotation>
+	<xs:simpleType name="attributeExtension">
+		<xs:annotation>
+			<xs:documentation>
+				<p>Where attribute values are declared, users can extend the allowed values by prepending the string &quot;x-&quot; to the values they desire to use. Attribute values are declared as the union of an enumerated set of values and this attributeExtension type.</p>
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="x-([^\s]+)"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="calendar">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Chinese"/>
+			<xs:enumeration value="Gregorian"/>
+			<xs:enumeration value="Islamic"/>
+			<xs:enumeration value="ISO"/>
+			<xs:enumeration value="Jewish"/>
+			<xs:enumeration value="Julian"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="divsOSIS">
+		<xs:annotation>
+			<xs:documentation>
+				<p>Enumerated list of types of div elements in an OSIS text. Note that users can add types of divs using the x- extension prefix on their type names.</p>
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="appendix"/>
+			<xs:enumeration value="book"/>
+			<xs:enumeration value="chapter"/>
+			<xs:enumeration value="concordance"/>
+			<xs:enumeration value="glossary"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:attributeGroup name="globalAttributes">
+		<xs:attribute name="ID" type="OSISID" use="optional"/>
+		<xs:attribute name="lang" type="languageType" use="optional"/>
+		<xs:attribute name="type" type="xs:string" use="optional"/>
+	</xs:attributeGroup>
+	<xs:attributeGroup name="referenceAttributes">
+		<xs:attribute name="refStart" type="referenceType" use="optional"/>
+		<xs:attribute name="refEnd" type="referenceType" use="optional"/>
+	</xs:attributeGroup>
+	<xs:attributeGroup name="startMilestoneAttributes">
+		<xs:attribute name="MID" type="milestoneID" use="required"/>
+		<xs:attribute name="MIDREF" type="milestoneIDREF" use="optional"/>
+	</xs:attributeGroup>
+	<xs:attributeGroup name="endMilestoneAttributes">
+		<xs:attribute name="MID" type="milestoneID" use="optional"/>
+		<xs:attribute name="MIDREF" type="milestoneIDREF" use="required"/>
+	</xs:attributeGroup>
+	<xs:simpleType name="languageType">
+		<xs:annotation>
+			<xs:documentation>
+				<p>A regex to validate ISO and Ethnologue language codes.</p>
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="(x|i|[A-Za-z]{2,3})(-[A-Za-z0-9]{2,8}){0,}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="namesOSIS">
+		<xs:annotation>
+			<xs:documentation>
+				<p>Enumerated list of name types commonly found in biblical texts.</p>
+				<p>The attribute nonhuman was inserted to allow the marking of names that are not encoded with the element divineName. The divineName element was introduced to treat name occurences that are treated differently, i.e., the setting of Lord in small caps, to represent a name in the original text. Rather than attempt to enumerate all the varying traditions for such practices, the divineName element simply recognizes it and allows encoders to follow that practice (or not) as they desire.</p>
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="geographic"/>
+			<xs:enumeration value="holiday"/>
+			<xs:enumeration value="nonhuman"/>
+			<xs:enumeration value="person"/>
+			<xs:enumeration value="ritual"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="notesOSIS">
+		<xs:annotation>
+			<xs:documentation>
+				<p>Enumerated list of note types for biblical texts. This list can be extended using the &lt;x-&gt; extension in front of other note types added by users.</p>
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="allusion"/>
+			<xs:enumeration value="alternative"/>
+			<xs:enumeration value="background"/>
+			<xs:enumeration value="citation"/>
+			<xs:enumeration value="devotional"/>
+			<xs:enumeration value="exegesis"/>
+			<xs:enumeration value="explanation"/>
+			<xs:enumeration value="study"/>
+			<xs:enumeration value="translation"/>
+			<xs:enumeration value="variant"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="role">
+		<xs:annotation>
+			<xs:documentation>
+				<p>This is a selected set of the most common role names likely to be needed for basic encoding. The full set of relator codes on which this listing (and the descriptions are based, was taken from: MARC Code List: Relator Codes -- Term Sequence (http://lcweb.loc.gov/marc/relators/re0002r1.html). This listing will be followed for later OSIS modules.</p>
+			</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="adp">
+				<xs:annotation>
+					<xs:documentation>Adapter: Use for a person who 1) reworks a musical composition,usually for a different medium, or 2) rewrites novels or stories for motionpictures or other audiovisual medium.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ann">
+				<xs:annotation>
+					<xs:documentation>Annotator: Use for a person who writes manuscript annotations on a printed item.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="art">
+				<xs:annotation>
+					<xs:documentation>Artist: Use for a person (e.g., a painter) who conceives, and perhaps also implements, an original graphic design or work of art, </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="aut">
+				<xs:annotation>
+					<xs:documentation>Author: Use for a person or corporate body chiefly responsiblefor the intellectual or artistic content of a work, usually printed text.  This term may also be used when more than one person or body bears such responsibility.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="aqt">
+				<xs:annotation>
+					<xs:documentation>Author in quotations or text extracts: Use for a person whose work is largely quoted or extracted in a works to which he or she did not contribute directly.  Such quotations are found particularly in exhibition catalogs, collections of photographs, etc.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="aft">
+				<xs:annotation>
+					<xs:documentation>Author of afterword, colophon, etc.: Use for a person or corporate body responsible for an afterword, postface, colophon, etc. but who isnot the chief author of a work.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="aui">
+				<xs:annotation>
+					<xs:documentation>Author of introduction, etc.: Use for a person or corporate body responsible for an introduction, preface, foreword, or other critical introductory matter, but who is not the chief author.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="bnd">
+				<xs:annotation>
+					<xs:documentation>Binder: </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="bdd">
+				<xs:annotation>
+					<xs:documentation>Binding designer:  Designer of binding</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="bkd">
+				<xs:annotation>
+					<xs:documentation>Book designer: Use for the person or firm responsible for the entire graphic design of a book, including arrangement of type and illustration,choice of materials, and process used.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="bkp">
+				<xs:annotation>
+					<xs:documentation>Book producer: Use for the person or firm responsible for the production of books and other print media, if specific codes</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="bjd">
+				<xs:annotation>
+					<xs:documentation>Bookjacket designer:  Designer of bookjacket</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="bpd">
+				<xs:annotation>
+					<xs:documentation>Bookplate designer: Designer of bookplate</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ctg">
+				<xs:annotation>
+					<xs:documentation>Cartographer: </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="clb">
+				<xs:annotation>
+					<xs:documentation>Collaborator: Use for a person or corporate body that takes a limited part in the elaboration of a work of another person or corporate body that brings complements (e.g., appendices, notes) to the work.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="cmm">
+				<xs:annotation>
+					<xs:documentation>Commentator: Use for a person who provides interpretation, analysis,or a discussion of the subject matter on a recording, motion picture, or other audiovisual medium.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="cwt">
+				<xs:annotation>
+					<xs:documentation>Commentator for written text: Use for a person or corporate body responsible for the commentary or explanatory notes about a text.  For the writer of manuscript annotations in a printed book, use Annotator</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="com">
+				<xs:annotation>
+					<xs:documentation>Compiler: Use for a person who produces a work or publication by selecting and putting together material from the works of various persons or bodies.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ctb">
+				<xs:annotation>
+					<xs:documentation>Contributor: Use for one whose work has been contributed to a larger work, such as an anthology, serial publication, or other compilation of individual works. Do not use for someone whose sole function in relation to a work is as author, editor, compiler or translator.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="cre">
+				<xs:annotation>
+					<xs:documentation>Creator: Use for a person or corporate body responsible for the intellectual or artistic content of a work.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="edt">
+				<xs:annotation>
+					<xs:documentation>Editor: Use for a person who prepares for publication a work not primarily his/her own, such as by elucidating text, adding introductory or other critical matter, or technically directing an editorial staff.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ilu">
+				<xs:annotation>
+					<xs:documentation>Illuminator: </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="ill">
+				<xs:annotation>
+					<xs:documentation>Illustrator: Use for the person who conceives, and perhaps also implements, a design or illustration, usually to accompany a written text.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="pbl">
+				<xs:annotation>
+					<xs:documentation>Publisher: </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="trl">
+				<xs:annotation>
+					<xs:documentation>Translator: Use for a person who renders a text from one language into another, or from an older form of a language into the modern form.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="target">
+                <xs:list itemType="referenceType"/>
+	</xs:simpleType>	
+	<xs:element name="text">
+		<xs:complexType>
+			<xs:annotation>
+				<xs:documentation>
+					<p>Front and body element are required and in that sequence. This is implied by the sequence content model. Note that back is optional, but if occurs, only once.</p>
+				</xs:documentation>
+			</xs:annotation>
+			<xs:sequence>
+				<xs:element ref="front"/>
+				<xs:element ref="body"/>
+				<xs:element ref="back" minOccurs="0"/>
+			</xs:sequence>
+			<xs:attribute name="refWork" type="refWorkType" use="required"/>
+			<xs:attributeGroup ref="globalAttributes"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="front">
+		<xs:annotation>
+			<xs:documentation>
+				<p>This will be greatly expanded for the publications module (Fall, 2002) but should be sufficient to encode the basic front matter found in most Bible translations.</p>
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:group ref="titleGroup"/>
+				<xs:element ref="author" maxOccurs="unbounded"/>
+				<xs:element ref="date" maxOccurs="unbounded"/>
+				<xs:element ref="copyright" maxOccurs="unbounded"/>
+				<xs:element ref="publisher" maxOccurs="unbounded"/>
+				<xs:element ref="pubPlace" maxOccurs="unbounded"/>
+				<xs:element ref="revisionDesc" maxOccurs="unbounded"/>
+				<xs:element ref="div" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="body">
+		<xs:annotation>
+			<xs:documentation>
+				<p>It should be noted at the outset that OSIS has followed XSEM in treating verses with milestone markers in a text. This is in large part because versification varies across editions and the use of milestones is the simplest way to allow varying encoding of verses and yet retain usuability of the text. This does not affect the presentation to the ultimate reader or its usefulness in electronic versions. If none of the foregoing was meaningful, do not be troubled. See the OSIS User documentation and simply follow the examples for marking verses. This is an issue now largely due to technical decisions made decades ago that still affect markup systems today.</p>
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:group ref="titleGroup" minOccurs="0"/>
+				<xs:element ref="div" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attributeGroup ref="globalAttributes"/>
+			<xs:attribute name="TEIform" fixed="body"/>
+			<xs:attributeGroup ref="referenceAttributes"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="back">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:group ref="titleGroup"/>
+				<xs:element ref="div" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attributeGroup ref="globalAttributes"/>
+			<xs:attribute name="TEIform" fixed="back"/>
+			<xs:attributeGroup ref="referenceAttributes"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:group name="annotationGroup">
+		<xs:annotation>
+			<xs:documentation>
+				<p>A group for common annotations recorded on a text.</p>
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element ref="divineName" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element ref="foreign" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element ref="inscription" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element ref="name" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element ref="note" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element ref="q" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element ref="reference" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element ref="speaker" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element ref="w" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:group>
+	<xs:group name="milestones">
+		<xs:annotation>
+			<xs:documentation>
+				<p>Milestones are used to mark the traditional book, chapter, verse divisions, which are the most likely to cross other divisions commonly used in translations. In addition to these milestones, there is a generic milestone marker for cases not forseen by the encoding team. Note that the segStart and segEnd milestones are the generic form of the milestone marker.</p>
+				<p>The attributes of the milestone markers require some comment for proper use. Note that all milestones have MID and MIDREF attributes but on a starting milestone, such as verseStart, the MID is required. That is a requirement because at the closing milestone for that verse, verseEnd, the attribute MIDREF is required. The MID and MIDREF serve to bind the two milestones together and provide some degree of validation for the use of milestones. If I properly note the MID on a starting milestone as: Matt.1.1 and then on the closing milestone enter: Mat.1.1 (Hard to see when typing but lost the second &quot;t&quot; in the abbreviation for Matthew, any XML parser will catch the error and tell me where the error has occurred.</p>
+				<p>Markup theorists will note that the named milestones are syntactic sugar for the more generic segStart and segStop milestones. While a departure from the overall simplicity of the schema, it is hoped that this naming of milestones will make it easier for beginning users to orient themselves to the use of such elements.</p>
+			</xs:documentation>
+		</xs:annotation>
+		<xs:choice>
+			<xs:element name="bookStart">
+				<xs:complexType>
+					<xs:attributeGroup ref="startMilestoneAttributes"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="bookEnd">
+				<xs:complexType>
+					<xs:attributeGroup ref="endMilestoneAttributes"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="chapterStart">
+				<xs:complexType>
+					<xs:attributeGroup ref="startMilestoneAttributes"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="chapterEnd">
+				<xs:complexType>
+					<xs:attributeGroup ref="endMilestoneAttributes"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="lineStart">
+				<xs:complexType>
+					<xs:attributeGroup ref="startMilestoneAttributes"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="lineEnd">
+				<xs:complexType>
+					<xs:attributeGroup ref="endMilestoneAttributes"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="qStart">
+				<xs:complexType>
+					<xs:attributeGroup ref="startMilestoneAttributes"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="qEnd">
+				<xs:complexType>
+					<xs:attributeGroup ref="endMilestoneAttributes"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="segStart">
+				<xs:complexType>
+					<xs:attributeGroup ref="startMilestoneAttributes"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="segEnd">
+				<xs:complexType>
+					<xs:attributeGroup ref="endMilestoneAttributes"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="speechStart">
+				<xs:complexType>
+					<xs:attributeGroup ref="startMilestoneAttributes"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="speechEnd">
+				<xs:complexType>
+					<xs:attributeGroup ref="endMilestoneAttributes"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="verseStart">
+				<xs:complexType>
+					<xs:attributeGroup ref="startMilestoneAttributes"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="verseEnd">
+				<xs:complexType>
+					<xs:attributeGroup ref="endMilestoneAttributes"/>
+				</xs:complexType>
+			</xs:element>
+		</xs:choice>
+	</xs:group>
+	<xs:group name="titleGroup">
+		<xs:annotation>
+			<xs:documentation>
+				<p>The titleGroup provides title and titlePart models both for front matter (as traditionally understood in the sense of title pages) as well as heading such as appear in other divisions of the text. The use of head and similar mechanisms seems to complicate the semantics of the markup with no real benefit to the user. Structurally, titles interrupt the flow of the text for some purpose, such as the beginning of a new theme, section, chapter or other division of the text.</p>
+				<p>The &lt;title&gt; mixed attribute is set to true and &lt;titlePart&gt; element is optional to allow for use of the &lt;title&gt; element in cases where &lt;titlePart&gt; is not desired. Thus the average user can simply input the title of a work without the added complexity of specifying parts of the title. The &lt;titlePart&gt; element is not recursive, in other words it cannot occur within &lt;titlePart&gt;.</p>
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element ref="title" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:group>
+	<xs:group name="translationGroup">
+		<xs:annotation>
+			<xs:documentation>
+				<p>A group that gathers claims made about a text in the process of translation.</p>
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element ref="ampRead" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element ref="changedTense" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element ref="ntProphecy" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element ref="otPassage" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element ref="supplied" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:group>
+	<xs:element name="ampRead">
+		<xs:complexType mixed="true">
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="note" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attributeGroup ref="globalAttributes"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="author">
+		<xs:annotation>
+			<xs:documentation>
+				<p>The author element has been defined globally to allow its use in a number of contexts. Users should note that the role of an author, i.e,, as editor, translator, etc., is required.</p>
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:choice>
+				<xs:element ref="persName"/>
+				<xs:element ref="orgName"/>
+			</xs:choice>
+			<xs:attributeGroup ref="globalAttributes"/>
+			<xs:attribute name="role" type="role" use="required"/>
+			<xs:attribute name="TEIform" fixed="author"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="changedTense">
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="note" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attributeGroup ref="globalAttributes"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="copyright">
+		<xs:annotation>
+			<xs:documentation>
+				<p>This element is fairly basic in the core module but will be extended in the publisher module to address a variety of rights, rights assignments, digital rights management and other issues.</p>
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="work"/>
+				<xs:element ref="copyrightDate"/>
+				<xs:element ref="holder"/>
+			</xs:sequence>
+			<xs:attributeGroup ref="globalAttributes"/>
+			<xs:attribute name="status" type="xs:string" use="optional"/>
+			<xs:attribute name="TEIform" fixed="availability"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="copyrightDate">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="year" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attributeGroup ref="globalAttributes"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="date">
+		<xs:complexType>
+			<xs:attributeGroup ref="globalAttributes"/>
+			<xs:attribute name="calendar" type="calendar" use="optional" default="ISO"/>
+			<xs:attribute name="value" use="optional"/>
+			<xs:attribute name="TEIform" fixed="date"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="div">
+		<xs:complexType>
+			<xs:sequence maxOccurs="unbounded">
+				<xs:group ref="titleGroup" minOccurs="0"/>
+				<xs:group ref="milestones" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:group ref="annotationGroup" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="figure" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="div" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="lineGroup" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="list" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="p" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:group ref="translationGroup" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="ID" type="OSISID" use="optional"/>
+			<xs:attribute name="lang" type="languageType" use="optional"/>
+			<xs:attribute name="type" type="divType" use="optional"/>
+			<xs:attribute name="divTitle" type="xs:string" use="optional"/>
+			<xs:attributeGroup ref="referenceAttributes"/>
+			<xs:attribute name="TEIform" fixed="div"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:simpleType name="divType">
+		<xs:union memberTypes="divsOSIS attributeExtension"/>
+	</xs:simpleType>
+	<xs:element name="divineName">
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base="xs:string">
+					<xs:attributeGroup ref="globalAttributes"/>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="figure">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="caption" minOccurs="0"/>
+			</xs:sequence>
+			<xs:attribute name="src" type="xs:string" use="required"/>
+			<xs:attribute name="figStart" type="referenceType" use="optional"/>
+			<xs:attribute name="figStop" type="referenceType" use="optional"/>
+			<xs:attributeGroup ref="globalAttributes"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="foreign">
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base="xs:string">
+					<xs:attributeGroup ref="globalAttributes"/>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="foreName">
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base="xs:string">
+					<xs:attributeGroup ref="globalAttributes"/>
+					<xs:attribute name="TEIform" fixed="foreName"/>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="head">
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base="xs:string">
+					<xs:attributeGroup ref="globalAttributes"/>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="holder">
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base="xs:string">
+					<xs:attributeGroup ref="globalAttributes"/>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="inscription">
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base="xs:string">
+					<xs:attributeGroup ref="globalAttributes"/>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="item">
+		<xs:complexType mixed="true">
+			<xs:sequence maxOccurs="unbounded">
+				<xs:group ref="annotationGroup" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:group ref="milestones" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:group ref="translationGroup" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attributeGroup ref="globalAttributes"/>
+			<xs:attributeGroup ref="referenceAttributes"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="line">
+		<xs:complexType mixed="true">
+			<xs:sequence maxOccurs="unbounded">
+				<xs:group ref="annotationGroup" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:group ref="milestones" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:group ref="translationGroup" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attributeGroup ref="globalAttributes"/>
+			<xs:attributeGroup ref="referenceAttributes"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="lineGroup">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="line" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attributeGroup ref="globalAttributes"/>
+			<xs:attributeGroup ref="referenceAttributes"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="list">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="head" minOccurs="0"/>
+				<xs:element ref="item" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attributeGroup ref="globalAttributes"/>
+			<xs:attributeGroup ref="referenceAttributes"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="name">
+		<xs:annotation>
+			<xs:documentation>
+				<p>An element with an attribute simiar to role that allows a semi-open attribute for specifying what type of name is being recorded in the markup. Examples include person, geographic, etc. Note the general format for enumerated values: a list is declared as a simpleType and then followed by a union statement combining that list with the attributeExtension simpleType which contains a regular expression constraining additions to the OSIS enumerated list to begin with the string &quot;x-&quot;. This allows OSIS to speify a list of values and yet allow users to extend that list.</p>
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base="xs:string">
+					<xs:attribute name="nameType" type="nameType" use="required"/>
+					<xs:attribute name="regular" type="xs:string" use="optional"/>
+					<xs:attributeGroup ref="globalAttributes"/>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:simpleType name="nameType">
+		<xs:union memberTypes="namesOSIS attributeExtension"/>
+	</xs:simpleType>
+	<xs:element name="note">
+		<xs:annotation>
+			<xs:documentation>
+				<p>Has enumerated list of note types. The note element can be attached to the text to which it applies using the noteStart and noteStop attributes.</p>
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence maxOccurs="unbounded">
+				<xs:element ref="p" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="notePart" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="ID" type="OSISID" use="optional"/>
+			<xs:attribute name="lang" type="languageType" use="optional"/>
+			<xs:attribute name="noteStart" type="referenceType" use="optional"/>
+			<xs:attribute name="noteStop" type="referenceType" use="optional"/>
+			<xs:attribute name="type" type="noteType" use="required"/>
+			<xs:attribute name="TEIform" fixed="note"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="notePart">
+		<xs:annotation>
+			<xs:documentation>
+				<p/>
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexType mixed="true">
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="p" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="notePart" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="reference" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="type" type="noteTypePart" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:simpleType name="noteTypePart">
+		<xs:union memberTypes="notesOSIS attributeExtension"/>
+	</xs:simpleType>
+	<xs:simpleType name="noteType">
+		<xs:union memberTypes="notesOSIS attributeExtension"/>
+	</xs:simpleType>
+	<xs:element name="ntProphecy">
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="note" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="target" type="referenceType" use="optional"/>
+			<xs:attributeGroup ref="globalAttributes"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="orgName">
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base="xs:string">
+					<xs:attributeGroup ref="globalAttributes"/>
+					<xs:attribute name="TEIform" fixed="orgName"/>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="otPassage">
+		<xs:complexType mixed="true">
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="note" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="target" type="referenceType" use="optional"/>
+			<xs:attributeGroup ref="globalAttributes"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="p">
+		<xs:complexType mixed="true">
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:group ref="annotationGroup" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="figure" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="lineGroup" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="list" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:group ref="milestones" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:group ref="translationGroup" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attributeGroup ref="globalAttributes"/>
+			<xs:attributeGroup ref="referenceAttributes"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="persName">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="foreName" minOccurs="0"/>
+				<xs:element ref="surName" minOccurs="0"/>
+			</xs:sequence>
+			<xs:attributeGroup ref="globalAttributes"/>
+			<xs:attribute name="TEIform" fixed="persName"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="publisher">
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base="xs:string">
+					<xs:attributeGroup ref="globalAttributes"/>
+					<xs:attribute name="TEIform" fixed="publisher"/>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="pubPlace">
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base="xs:string">
+					<xs:attributeGroup ref="globalAttributes"/>
+					<xs:attribute name="TEIform" fixed="pubPlace"/>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="q">
+		<xs:complexType mixed="true">
+			<xs:sequence>
+				<xs:element ref="q" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attributeGroup ref="globalAttributes"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="reference">
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base="xs:string">
+					<xs:attributeGroup ref="globalAttributes"/>
+					<xs:attribute name="targetStart" type="referenceType" use="required"/>
+					<xs:attribute name="targetEnd" type="referenceType" use="optional"/>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="revisionDesc">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="p" maxOccurs="unbounded">
+					<xs:simpleType>
+						<xs:restriction base="xs:string"/>
+					</xs:simpleType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attributeGroup ref="globalAttributes"/>
+			<xs:attribute name="TEIform" fixed="revisionDesc"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="speaker">
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base="xs:string">
+					<xs:attribute name="who" type="xs:string"/>
+					<xs:attributeGroup ref="globalAttributes"/>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="supplied">
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element ref="note" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attributeGroup ref="globalAttributes"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="surName">
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base="xs:string">
+					<xs:attributeGroup ref="globalAttributes"/>
+					<xs:attribute name="TEIform" fixed="surName"/>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="title">
+		<xs:complexType>
+			<xs:sequence maxOccurs="unbounded">
+				<xs:element ref="titlePart"/>
+			</xs:sequence>
+			<xs:attributeGroup ref="globalAttributes"/>
+			<xs:attribute name="TEIform" fixed="title"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="titlePart">
+		<xs:complexType mixed="true">
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:group ref="annotationGroup" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attributeGroup ref="globalAttributes"/>
+			<xs:attribute name="TEIform" fixed="title"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="w">
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base="xs:string">
+					<xs:attribute name="POS" type="attributeExtension" use="optional"/>
+					<xs:attribute name="morph" type="attributeExtension" use="optional"/>
+					<xs:attribute name="lemma" type="attributeExtension" use="optional"/>
+					<xs:attribute name="gloss" type="xs:string" use="optional"/>
+					<xs:attribute name="sync" type="target" use="optional"/>
+					<xs:attribute name="xlit" type="xs:string" use="optional"/>
+					<xs:attribute name="TEIform" fixed="w"/>
+					<xs:attributeGroup ref="globalAttributes"/>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="work">
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base="xs:string">
+					<xs:attributeGroup ref="globalAttributes"/>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="year" type="xs:gYear"/>
+	<!-- For validation of various type of texts, these simpleTypes should be redefined. -->
+	<!-- See OSISScripture.1.0.xsd for an example of redefining.                         -->
+	<xs:simpleType name="refWorkType">
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	<xs:simpleType name="referenceType">
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	<xs:simpleType name="milestoneID">
+		<xs:restriction base="xs:ID"/>
+	</xs:simpleType>
+	<xs:simpleType name="milestoneIDREF">
+		<xs:restriction base="xs:IDREF"/>
+	</xs:simpleType>
+	<xs:simpleType name="OSISID">
+		<xs:restriction base="xs:ID"/>
+	</xs:simpleType>
+	<xs:simpleType name="OSISIDREF">
+		<xs:restriction base="xs:IDREF"/>
+	</xs:simpleType>
+	<!-- End of things that should be defined -->
+</xs:schema>
